@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+import requests
+import os
+
 
 # 定义人员列表
 people = ["张三", "李四", "王五", "赵六", "孙七"]
@@ -31,6 +34,45 @@ for week in range(weeks_to_schedule):
 first_schedule = schedule_list[0]  # 当前值班
 second_schedule = schedule_list[1]  # 下周值班准备
 
-# 输出结果
-print(f"当前值班: 日期: {first_schedule[0]}, 值班人员: @{first_schedule[1]}")
-print(f"下周值班准备: 日期: {second_schedule[0]}, 值班人员: @{second_schedule[1]}")
+
+# 获取前两个排班记录
+first_schedule = schedule_list[0]  # 当前值班
+second_schedule = schedule_list[1]  # 下周值班准备
+
+
+# # 输出结果
+# print(f"当前值班: 日期: {first_schedule[0]}, 值班人员: @{first_schedule[1]}")
+# print(f"下周值班准备: 日期: {second_schedule[0]}, 值班人员: @{second_schedule[1]}")
+
+
+# 钉钉机器人推送消息
+def send_dingtalk_message(message):
+    # 从环境变量中获取钉钉机器人的 access_token
+    access_token = os.getenv("DINGTALK_ACCESS_TOKEN")
+    if not access_token:
+        print("未找到钉钉机器人的 access_token，请检查环境变量配置。")
+        return
+    
+    # 钉钉机器人 Webhook URL
+    webhook_url = f"https://oapi.dingtalk.com/robot/send?access_token=adf06e88371122cbbc200796e9c4fb9d04678c5e3ae5facb2a25f099e34a469b"
+    
+    # 消息内容
+    data = {
+        "msgtype": "text",
+        "text": {
+            "content": message
+        }
+    }
+    
+    # 发送请求
+    response = requests.post(webhook_url, json=data)
+    if response.status_code == 200:
+        print("消息推送成功！")
+    else:
+        print(f"消息推送失败，状态码: {response.status_code}, 响应内容: {response.text}")
+
+# 构造推送消息
+message = f"值班提醒：\n当前值班: 日期: {first_schedule[0]}, 值班人员: {first_schedule[1]}\n下周值班准备: 日期: {second_schedule[0]}, 值班人员: {second_schedule[1]}"
+
+# 推送消息到钉钉
+send_dingtalk_message(message)
