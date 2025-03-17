@@ -25,4 +25,4 @@ jobs:
         env:
           DINGTALK_ACCESS_TOKEN: ${{ secrets.DINGTALK_ACCESS_TOKEN }}  # 从 GitHub Secrets 中获取
         run: |
-          python schedule.py
+          python pai_ban.py
